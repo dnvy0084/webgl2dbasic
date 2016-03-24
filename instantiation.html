@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        #img_a{
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="600" height="600">
+    </canvas>
+    <img src="img/a.jpg" id="img_a"/>
+
+    <script type="x-shader" id="vertexSource">
+
+        attribute vec2 vertex;
+        attribute vec2 uv;
+
+        varying vec2 fragUV;
+
+        uniform mat3 mat;
+
+        uniform vec2 viewport;
+
+        void main(){
+
+            fragUV = uv;
+
+            vec3 p = vec3( vertex, 1 );
+
+            p = mat * p;
+
+            p.xy = p.xy / viewport * 2.0 - 1.0;
+
+            gl_Position = vec4( p.x, -p.y, 0, 1 );
+        }
+
+    </script>
+    <script type="x-shader" id="fragmentSource">
+
+        precision highp float;
+
+        varying vec2 fragUV;
+
+        uniform sampler2D tex;
+
+        void main(){
+
+            vec4 pixel = texture2D( tex, fragUV );
+
+            //pixel.rgb = pixel.rgb - 0.5; // 밝기
+
+            //pixel.rgb = 2.0 * ( pixel.rgb - 0.5 ) + 0.5; // 대비
+
+            //float grey = pixel.r * 0.2 + pixel.g * 0.7 + pixel.b * 0.1; // 흑백
+
+            //pixel.rgb = vec3( grey, grey, grey );
+            //pixel.r += 0.1;
+
+            //pixel.r = pixel.b;
+            //pixel.g = pixel.g;
+            //pixel.b = pixel.r;
+
+            gl_FragColor = pixel;
+        }
+
+    </script>
+    <script>
+
+        function Quad( img ) {
+
+            this.x = 0;
+            this.y = 0;
+            this.scaleX = 1;
+            this.scaleY = 1;
+            this.rotation = 0;
+
+            this.matrix = new Float32Array(9);
+
+            this.matrix[0] = 1, this.matrix[3] = 0, this.matrix[6] = 0,
+            this.matrix[1] = 0, this.matrix[4] = 1, this.matrix[7] = 0,
+            this.matrix[2] = 0, this.matrix[5] = 0, this.matrix[8] = 1;
+
+
+            this.makeBuffer( img.width, img.height );
+            this.makeTexture( img );
+        }
+
+        Quad.prototype = {
+            constructor: Quad,
+
+            makeBuffer: function (w, h) {
+
+                this.buffer = gl.createBuffer();
+
+                var data = new Float32Array([
+                        0, 0, 0, 0,
+                        w, 0, 1, 0,
+                        w, h, 1, 1,
+                        0, h, 0, 1,
+                ])
+
+                gl.bindBuffer( gl.ARRAY_BUFFER, this.buffer );
+                gl.bufferData( gl.ARRAY_BUFFER, data, gl.STATIC_DRAW );
+
+                this.indexBuffer = gl.createBuffer();
+
+                var indexData = new Uint16Array([
+                        0, 1, 2,    0, 2, 3
+                ])
+
+                gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer );
+                gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW );
+            },
+
+            makeTexture: function (img) {
+                this.tex = gl.createTexture();
+
+                gl.bindTexture( gl.TEXTURE_2D, this.tex );
+                    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE );
+                    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE );
+                    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR );
+                    gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR );
+                gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img );
+            },
+
+            update: function () {
+
+                var cos = Math.cos( this.rotation );
+                var sin = Math.sin( this.rotation );
+
+                this.matrix[0] = cos * this.scaleX, this.matrix[3] = sin * this.scaleY, this.matrix[6] = this.x,
+                this.matrix[1] = -sin * this.scaleX, this.matrix[4] = cos * this.scaleY, this.matrix[7] = this.y,
+                this.matrix[2] = 0, this.matrix[5] = 0, this.matrix[8] = 1;
+            },
+
+            render: function () {
+
+                gl.bindBuffer( gl.ARRAY_BUFFER, this.buffer );
+                gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer );
+
+                gl.bindTexture( gl.TEXTURE_2D, this.tex );
+
+                gl.vertexAttribPointer( program.vertex, 2, gl.FLOAT, false, 4 * 4, 0 );
+                gl.vertexAttribPointer( program.uv, 2, gl.FLOAT, false, 4 * 4, 4 * 2 );
+
+                this.update();
+                gl.uniformMatrix3fv( program.mat, false, this.matrix );
+                gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
+            },
+        };
+
+
+
+
+        var canvas;
+        var gl;
+
+        var children = [];
+
+        function init() {
+
+            canvas = document.getElementById( "canvas" );
+            gl = canvas.getContext( "webgl" ) || canvas.getContext( "experimental-webgl" );
+            var img = document.getElementById( "img_a" );
+
+            console.log(gl);
+
+            initGL();
+
+            makeProgram();
+
+            for (var i = 0; i < 10; i++) {
+
+                var q = new Quad( img );
+
+                q.x = i * 10;
+                q.y = i * 10;
+
+                children.push( q )
+            }
+
+            this.quad = q;
+
+            requestAnimationFrame( draw );
+        }
+
+        function draw(ms) {
+
+            requestAnimationFrame( draw );
+
+            gl.clear( gl.COLOR_BUFFER_BIT );
+
+            //this.quad.x+= 0.5;
+            this.quad.rotation = ms / 500;
+
+
+            console.log(this.quad.x);
+
+            for (var i = 0; i < children.length; i++) {
+                children[i].render();
+            }
+        }
+
+        var program;
+        function makeProgram() {
+            program = gl.createProgram();
+
+            var vertexShaderSource = document.getElementById( "vertexSource").innerHTML;
+            var vertexShader = gl.createShader( gl.VERTEX_SHADER );
+
+            gl.shaderSource( vertexShader, vertexShaderSource );
+            gl.compileShader( vertexShader );
+
+            var complete = gl.getShaderParameter( vertexShader, gl.COMPILE_STATUS );
+
+            if( complete == false ){
+                console.log(gl.getShaderInfoLog(vertexShader));
+            }
+
+            var fragmentShaderSource = document.getElementById( "fragmentSource").innerHTML;
+            var fragmentShader = gl.createShader( gl.FRAGMENT_SHADER );
+
+            gl.shaderSource( fragmentShader, fragmentShaderSource );
+            gl.compileShader( fragmentShader );
+
+
+            gl.attachShader( program, vertexShader );
+            gl.attachShader( program, fragmentShader );
+            gl.linkProgram( program );
+
+            complete = gl.getProgramParameter( program, gl.LINK_STATUS );
+
+            if( complete == false ){
+                console.log(gl.getProgramInfoLog(program));
+            }
+
+            gl.useProgram( program );
+
+            program.mat = gl.getUniformLocation( program, "mat" );
+            program.viewport = gl.getUniformLocation( program, "viewport" );
+
+            program.vertex = gl.getAttribLocation( program, "vertex" );
+            program.uv = gl.getAttribLocation( program, "uv" );
+
+            gl.enableVertexAttribArray( program.vertex );
+            gl.enableVertexAttribArray( program.uv );
+
+            gl.uniform2f( program.viewport, gl.drawingBufferWidth, gl.drawingBufferHeight );
+
+            console.log("program ready");
+        }
+
+        function initGL(){
+
+            gl.clearColor( 0, 0, 0, 1 ); // rgba(255,0,0,1);
+            gl.clear( gl.COLOR_BUFFER_BIT );
+        }
+
+        window.onload = init;
+
+    </script>
+</body>
+</html>

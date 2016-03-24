@@ -9,9 +9,9 @@
     </style>
 </head>
 <body>
-    <img src="img/a.jpg" id="img_a"/>
     <canvas id="canvas" width="600" height="600">
     </canvas>
+    <img src="img/a.jpg" id="img_a"/>
 
     <script type="x-shader" id="vertexSource">
 
@@ -210,10 +210,15 @@
             gl.vertexAttribPointer( vertexIndex, 2, gl.FLOAT, false, 4 * 4, 0 );
             gl.vertexAttribPointer( uv, 2, gl.FLOAT, false, 4 * 4, 4 * 2 );
 
+            var t = ms / 500;
+
+            var cos = Math.cos( t );
+            var sin = Math.sin( t );
+
             var matVector = new Float32Array([
-                    1,0,0,
-                    0,1,0,
-                    0,0,1
+                    2 * cos,    2 * sin,    0,
+                    -sin * 2,   2 * cos,0,
+                    100,        100,    1
             ]);
 
             gl.uniformMatrix3fv( mat, false, matVector );
