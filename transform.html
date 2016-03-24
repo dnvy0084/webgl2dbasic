@@ -3,11 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title></title>
+    <style>
+        #img_a{
+        }
+    </style>
 </head>
 <body>
+    <img src="img/a.jpg" id="img_a"/>
     <canvas id="canvas" width="600" height="600">
     </canvas>
-    <img src="img/a.jpg" id="img_a"/>
 
     <script type="x-shader" id="vertexSource">
 
@@ -93,6 +97,27 @@
             makeBuffer();
 
             requestAnimationFrame( draw );
+
+//            var img = document.getElementById( "img_a" );
+//
+//
+//
+//            var cos = Math.cos( Math.PI / 4  )
+//            var sin = Math.sin( Math.PI / 4 );
+//
+//
+//
+//            var a = [
+//                    cos, -sin, sin, cos, 0, 0
+//            ];
+//
+//
+//            transform: scale( 1, 1 );
+//            transform: translate( );
+//            transform: rotate();
+//            transform: matrix( n,n,n,n,n,n );
+//
+//            img.style.webkitTransform = "matrix(" + a.join() + ")"
         }
 
         var tex;
@@ -204,7 +229,7 @@
             gl.uniform2fv( xy, new Float32Array([ 100, 100 ]) );
             gl.uniform2f( viewport, gl.canvas.width, gl.canvas.height );
             gl.uniform2f( scale, 2.0, 2.0 );
-            gl.uniform1f( rotate, ms / 500 );
+            gl.uniform1f( rotate, ms / 1000 );
 
             //gl.drawArrays( gl.TRIANGLES, 0, 6 );
 
