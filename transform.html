@@ -17,13 +17,27 @@
         varying vec2 fragUV;
 
         uniform vec2 xy;
+        uniform vec2 scale;
+        uniform float rotate;
         uniform vec2 viewport;
 
         void main(){
 
             fragUV = uv;
 
-            vec2 p = vertex + xy;
+            vec2 p = vertex;
+
+            float cos = cos( rotate );
+            float sin = sin( rotate );
+
+            float x = cos * p.x - sin * p.y;
+            float y = sin * p.x + cos * p.y;
+
+            //p = vec2( x, y );
+            p.x = x;
+            p.y = y;
+            p = p * scale; // p.x = p.x * scale.x, y
+            p = p + xy;
 
             p = p / viewport * 2.0 - 1.0;
 
@@ -174,6 +188,8 @@
             //var translate = gl.getUniformLocation( program, "translate" );
             var xy = gl.getUniformLocation( program, "xy" );
             var viewport = gl.getUniformLocation( program, "viewport" );
+            var scale = gl.getUniformLocation( program, "scale" );
+            var rotate = gl.getUniformLocation( program, "rotate" );
 
             var uv = gl.getAttribLocation( program, "uv" );
 
@@ -187,6 +203,8 @@
 
             gl.uniform2fv( xy, new Float32Array([ 100, 100 ]) );
             gl.uniform2f( viewport, gl.canvas.width, gl.canvas.height );
+            gl.uniform2f( scale, 2.0, 2.0 );
+            gl.uniform1f( rotate, ms / 500 );
 
             //gl.drawArrays( gl.TRIANGLES, 0, 6 );
 
