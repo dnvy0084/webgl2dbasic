@@ -10,38 +10,22 @@
 
     <script type="x-shader" id="vertexSource">
 
-        // 변수타입 변수명 var a = 1;
-        // int a = 1;
-
-        // var a = [];
-        // a[0] = 1;
-
-        //vec2 a = vec2( 1, 2 );
-        //vec2 b = vec2( 3, 4 );
-
-        //vec2 c = a + b;
-
-        // c.x = a.x + b.x;
-        // c.y = a.y + b.y;
-
-        attribute vec2 vertex; // ( x, y ) or ( r, g ); vertex.x, vertex.y == vertex.r, vertex.g
-        attribute vec3 color;
-
-        varying vec3 fragColor;
-
-        //uniform float translate;
-
-
-        //uniform float x;
-        //uniform float y;
+        attribute vec2 vertex;
 
         uniform vec2 xy;
 
+        uniform vec2 viewport;
+
         void main(){
 
-            fragColor = color;
+            vec2 p = vertex + xy;
 
-            gl_Position = vec4( vertex + xy, 0, 1 );
+            //p.x = p.x / 600.0 * 2.0 - 1.0;
+            //p.y = p.y / 600.0 * 2.0 - 1.0;
+
+            p = p / viewport * 2.0 - 1.0;
+
+            gl_Position = vec4( p.x, -p.y, 0, 1 );
         }
 
     </script>
@@ -49,10 +33,8 @@
 
         precision highp float;
 
-        varying vec3 fragColor;
-
         void main(){
-            gl_FragColor = vec4( fragColor, 1 );
+            gl_FragColor = vec4( 1, 0, 0, 1 );
         }
 
     </script>
@@ -120,12 +102,12 @@
 
             buffer = gl.createBuffer();
 
-            var w = 0.8, h = 0.8;
+            var w = 150, h = 150;
             var data = new Float32Array([
-                    0, 0, 1, 0, 0, // x, y(vertex) - r, g, b(color);
-                    w, 0, 0, 1, 0,
-                    w, h, 0, 0, 1,
-                    0, h, 1, 0, 1,
+                    0, 0,
+                    w, 0,
+                    w, h,
+                    0, h,
             ])
 
             gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
@@ -153,16 +135,16 @@
 
             //var translate = gl.getUniformLocation( program, "translate" );
             var xy = gl.getUniformLocation( program, "xy" );
+            var viewport = gl.getUniformLocation( program, "viewport" );
 
             var vertexIndex = gl.getAttribLocation( program, "vertex" );
             var colorIndex = gl.getAttribLocation( program, "color" );
 
             gl.enableVertexAttribArray( vertexIndex );
-            gl.enableVertexAttribArray( colorIndex );
-            gl.vertexAttribPointer( vertexIndex, 2, gl.FLOAT, false, 4 * 5, 0 );
-            gl.vertexAttribPointer( colorIndex, 3, gl.FLOAT, false, 4 * 5, 4 * 2 );
+            gl.vertexAttribPointer( vertexIndex, 2, gl.FLOAT, false, 4 * 2, 0 );
 
-            gl.uniform2fv( xy, new Float32Array([-1,0]) );
+            gl.uniform2fv( xy, new Float32Array([ 100, 100 ]) );
+            gl.uniform2f( viewport, 1200, 1200 )//gl.canvas.width, gl.canvas.height );
 
             //gl.drawArrays( gl.TRIANGLES, 0, 6 );
 
