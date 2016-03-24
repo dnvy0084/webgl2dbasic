@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>bootstrap tutorial</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+    <style>
+        .position-absolute{
+            position: absolute;
+        }
+
+        #ui-layer{
+            padding: 5px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <canvas id="canvas" class="position-absolute"></canvas>
+    <div id="ui-layer" class="position-absolute">
+        <nav id="nav" class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">PhotoEditor <small>se3.0</small></a>
+                </div>
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Test case</a>
+                        <ul id="case-parent" class="dropdown-menu" role="meni">
+                            <li><a href="#">Bootstrap basic sample</a></li>
+                            <li><a href="#">Bootstrap panel sample</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#">CSS Transform 2D</a></li>
+                            <li><a href="#">CSS Transform matrix3d</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                            <span class="glyphicon glyphicon-align-justify"></span>
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="http://wiki.navercorp.com/pages/viewpage.action?pageId=320123080" target="_blank">Wiki</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#"><small><span class="glyphicon glyphicon-plus"></span>RIA</a></small></li>
+                            <li><a href="http://flashdev.naver.com/canvas_review/naver_photoeditor/" target="_blank">Review</a></li>
+                            <li><a href="http://10.113.182.19" target="_blank">Redmine</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</div>
+
+<div class="asset">
+    <img src="img/a.jpg" alt="" id="img_a"/>
+</div>
+
+
+<script type="text/javascript">
+
+    function init() {
+
+        //buttonExample();
+
+    }
+
+    function buttonExample() {
+        var button = $( '<button id="a" class="btn btn-primary" type="button">button</button>' );
+
+        $("#ui-layer").append( button );
+
+        button.on( "click", function(e){
+            var $btn = $(this).button( "loading" );
+
+            setTimeout(function () {
+                $btn.button( "reset" );
+            }, 1000 );
+        })
+    }
+
+    window.onload = init;
+
+</script>
+</body>
+</html>

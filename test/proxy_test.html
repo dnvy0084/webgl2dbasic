@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+    <canvas id="canvas" width="260" height="260">
+
+        <script type="text/javascript">
+
+            var url = "http://static-beta.play.naver.co.jp/img/read/avatar_2000000072_wbprofile/FR_100000003546921445915581174.png";
+            var context = document.getElementById( "canvas").getContext("2d");
+
+            var img = document.createElement("img");
+            img.crossOrigin = "anonymous";
+            img.src = "http://10.113.216.159:10080/?sURL=" + url;
+
+            img.onload = function(e){
+
+                context.setTransform(
+                        Math.cos(Math.PI),
+                        -Math.sin(Math.PI),
+                        Math.sin(Math.PI),
+                        Math.cos(Math.PI),
+                        260,
+                        260
+                );
+
+                context.drawImage( img, 0, 0 );
+
+                var data = context.getImageData(0,0,context.canvas.width, context.canvas.height);
+                context.clearRect( 0, 0, context.canvas.width, context.canvas.height );
+
+                filter( data.data );
+                context.putImageData( data, 0, 0 );
+
+                //console.log( context.canvas.toDataURL( "image/png" ) );
+
+                var grey = document.createElement("img");
+                grey.src = context.canvas.toDataURL( "image/png" );
+
+                document.body.appendChild( grey );
+            };
+
+            function filter( data ){
+
+                var g;
+
+                for (var i = 0, l = data.length; i < l; i+=4) {
+
+                    g = data[i+0] * 0.2 + data[i+1] * 0.7 + data[i+2] * 0.1;
+
+                    data[i+0] = data[i+1] = data[i+2] = g;
+                }
+            };
+
+            document.body.appendChild( img );
+
+        </script>
+
+    </canvas>
+</body>
+</html>

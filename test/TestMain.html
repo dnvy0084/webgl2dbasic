@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Photo Editor TestMain</title>
+    <link rel="stylesheet" type="text/css" href="css/common.css">
+    <script src="http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js"></script>
+    <script type="text/javascript" src="js/testcase/TestCase.js"></script>
+    <script type="text/javascript" src="js/testcase/YUIPanelTest.js"></script>
+    <script type="text/javascript" src="js/testcase/CSSTransform3D_Quad.js"></script>
+    <script type="text/javascript" src="js/testcase/CSSTansform2D_Quad.js"></script>
+    <script type="text/javascript" src="js/testcase/CSSTransform3D_01.js"></script>
+    <script type="text/javascript" src="js/testcase/YUITutorial.js"></script>
+    <script type="text/javascript" src="js/testcase/BitmapDataFilterApplyTest.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+</head>
+<body>
+
+<div class="wrapper yui3-skin-sam">
+    <canvas id="stage" class="position-absolute"></canvas>
+    <div id="content" class="position-absolute"></div>
+    <div id="ui-layer" class="position-absolute"></div>
+</div>
+
+<div class="forms yui-skin-sam">
+    <div id="matrix-container" class="sliders">
+        <dl>
+            <dt class="prefix">1:<span class="val"></span></dt>
+            <dd class="slider-parent"></dd>
+            <dt class="prefix">2:<span class="val"></span></dt>
+            <dd class="slider-parent"></dd>
+            <dt class="prefix">3:<span class="val"></span></dt>
+            <dd class="slider-parent"></dd>
+            <dt class="prefix">4:<span class="val"></span></dt>
+            <dd class="slider-parent"></dd>
+        </dl>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    "use strict";
+
+    function init() {
+
+        var widgets = [
+            "button",
+            "slider",
+            "autocomplete",
+            "autocomplete-filters",
+            "autocomplete-highlighters",
+            "event-outside",
+        ];
+
+        var main = new TestMain();
+
+        main.initCanvas( "stage" );
+        main.initUILayer( "sam", widgets );
+    }
+
+    window.onload = init;
+
+</script>
+
+</body>
+</html>

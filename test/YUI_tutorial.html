@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test main</title>
+    <style>
+
+        body{
+            margin: 0 0 0 0;
+        }
+
+        .wrapper{
+            margin: 0 0 0 0;
+        }
+        
+        .input{
+            font-family: NanumGothic;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .yui3-button
+        {
+            margin-right: 5px;
+        }
+        
+        #ui-layer{
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            margin: 5px;
+        }
+
+        #canvas{
+            position: absolute;
+            top: 0px;
+            left: 0px;
+        }
+
+        .case-dropdown{
+            width: 250px;
+        }
+
+    </style>
+    <script src="http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+    <div class="wrapper">
+        <canvas id="canvas" width="800" height="600"></canvas>
+        <div id="ui-layer">
+            <!--<span id="dropdown" class="ui-dropdown">test dropdown</span>-->
+        </div>
+    </div>
+
+
+    <script type="text/javascript">
+
+        var canvas;
+        var context;
+
+        var widgets = [
+            "button",
+            "slider",
+            "autocomplete",
+            "autocomplete-filters",
+            "autocomplete-highlighters",
+            "event-outside",
+        ];
+
+        YUI({skin: "sam"}).use( widgets, function (Y) {
+
+            var cases = [
+                    "YUI Sample(tutorial)",
+                    "ECMA script 2015",
+                    "transpile test",
+                    "ColorMatrix Fileter",
+                    "Convolution Matrix",
+                    "Matrix Multiplication"
+            ];
+
+            var dropdownButton = new Y.Button({
+                srcNode:"#button-dropdown",
+                label: cases[0]
+            }).render( "#ui-layer");
+
+            var buttonNode = dropdownButton.get( "srcNode" );
+            buttonNode._node.classList.add( "case-dropdown" );
+
+            console.log( dropdownButton, Y.one("#button-dropdown"), dropdownButton.get("srcNode"));
+
+            var ac = new Y.AutoCompleteList({
+                inputNode: buttonNode,
+                source: cases,
+                render: true,
+                minQueryLenght: 0,
+                tabSelect: true,
+                activateFirstItem: true
+            });
+
+            buttonNode.on( "click", function(e){
+
+                e.stopPropagation();
+
+                if( ac.get("visible"))
+                {
+                    ac.hide();
+                }
+                else
+                {
+                    ac.sendRequest();
+                    ac.show();
+                }
+            })
+        });
+
+
+        function init() {
+
+            canvas = document.getElementById( "canvas" );
+            context = canvas.getContext( "2d" );
+
+            onResize();
+        }
+
+        function onResize() {
+
+            console.log( "resize" );
+
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            canvas.addEventListener( "click", function () {
+                console.log("click");
+            })
+        }
+
+        function initEvents() {
+
+            function preventDefault( e ) {
+                e = e || event;
+                e.preventDefault();
+            }
+
+            window.addEventListener( "drop", preventDefault );
+            window.addEventListener( "dragover", preventDefault );
+
+            window.onresize = onResize;
+            window.onload = init;
+        }
+
+        initEvents();
+
+    </script>
+</body>
+</html>

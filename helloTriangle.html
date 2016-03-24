@@ -29,11 +29,13 @@
 
         varying vec3 fragColor;
 
+        uniform float translate;
+
         void main(){
 
             fragColor = color;
 
-            gl_Position = vec4( vertex.x, vertex.y, 0, 1 );
+            gl_Position = vec4( vertex + translate, 0, 1 );
         }
 
     </script>
@@ -65,7 +67,7 @@
             makeProgram();
             makeBuffer();
 
-            draw();
+            requestAnimationFrame( draw );
         }
 
         var program;
@@ -114,7 +116,7 @@
 
             var w = 0.8, h = 0.8;
             var data = new Float32Array([
-                    0, 0, 1, 0, 0, // x, y, r, g, b;
+                    0, 0, 1, 0, 0, // x, y(vertex) - r, g, b(color);
                     w, 0, 0, 1, 0,
                     w, h, 0, 0, 1,
                     0, h, 1, 0, 1,
@@ -134,12 +136,16 @@
             gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW );
         }
 
-        function draw() {
+        function draw( ms ) {
+
+            requestAnimationFrame( draw );
 
             gl.clear( gl.COLOR_BUFFER_BIT );
 
             gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
             gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
+
+            var translate = gl.getUniformLocation( program, "translate" );
 
             var vertexIndex = gl.getAttribLocation( program, "vertex" );
             var colorIndex = gl.getAttribLocation( program, "color" );
@@ -148,6 +154,9 @@
             gl.enableVertexAttribArray( colorIndex );
             gl.vertexAttribPointer( vertexIndex, 2, gl.FLOAT, false, 4 * 5, 0 );
             gl.vertexAttribPointer( colorIndex, 3, gl.FLOAT, false, 4 * 5, 4 * 2 );
+
+            gl.uniform1f( translate, Math.cos( ms / 500 ) );
+
             //gl.drawArrays( gl.TRIANGLES, 0, 6 );
 
             gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );

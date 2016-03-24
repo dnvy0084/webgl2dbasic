@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>file open as drag and drop and local file cors test</title>
+    <style>
+        canvas{
+            border: 1px solid #aaa;
+            position: absolute;
+        }
+
+        #outer{
+            position: absolute;
+            width: 800px;
+            height: 600px;
+        }
+
+        #inner{
+            position: absolute;
+            width: 100%;
+            top: 50%;
+
+            text-align: center;
+            font-family: Helvetica;
+            font-size: 3em;
+            color: #ddd;
+
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            /* this will work for QtWebKit in future */
+            -webkit-user-drag: none;
+            transform: translate( 0%, -50% );
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper" width="800" height="600">
+        <h3 class="title">Drag&Drop local file, CORS check</h3>
+
+        <canvas id="stage" width="800" height="600"></canvas>
+        <div id="outer">
+            <div id="inner">Drag And Drop Image File</div>
+            <!--<input type="file" id="fileselect"/>-->
+        </div>
+    </div>
+    <script type="text/javascript">
+
+        "use strict";
+
+        var fileInput;
+        var canvas;
+        var context;
+
+        function init() {
+
+            console.log( "init" );
+
+            fileInput = document.getElementById("outer");
+            canvas = document.getElementById( "stage" );
+            context = canvas.getContext( "2d" );
+
+            fileInput.addEventListener( "drop", onFileDrop );
+        }
+
+        function onFileDrop( e ) {
+
+            console.log( "drop file", e );
+
+            var data = e.target.files || e.dataTransfer.files;
+
+            if(data.length == 0) alert( "not exist file" );
+            if(data.length > 1) alert( "cannot open multiple files" );
+
+            var reader = new FileReader();
+            reader.onload = function (e) {
+
+                loadImage(e.target.result );
+            }
+            reader.readAsDataURL( data[0] );
+
+            console.log(data);
+        }
+
+
+        function loadImage( dataURL ) {
+
+            var img = document.createElement("img");
+
+            img.src = dataURL;
+
+            function draw() {
+                imgData= getImageData( img );
+                console.log( imgData );
+
+                grayscale( imgData );
+                context.putImageData( imgData, 0, 0 );
+            }
+
+            console.log( "image load complete", img.complete );
+
+            var imgData;
+
+            if( img.complete )
+            {
+                draw();
+            }
+            else
+            {
+                img.onload = function (e) {
+                    draw();
+                }
+            }
+        }
+
+        function grayscale( imgData ) {
+
+            var buf = imgData.data, r, g, b, _grayscale;
+
+            console.log( buf.length, imgData.width * imgData.height * 4 );
+
+            for (var i = 0; i < buf.length; i+=4 ) {
+
+                r = buf[i  ];
+                g = buf[i+1];
+                b = buf[i+2];
+
+                _grayscale = 0.2 * r + 0.7 * g + 0.1 * b;
+
+                buf[i  ] = _grayscale;
+                buf[i+1] = _grayscale;
+                buf[i+2] = _grayscale;
+            }
+        }
+
+
+
+        var offscreen = document.createElement( "canvas" );
+        var gl = offscreen.getContext( "2d" );
+
+        function getImageData(img) {
+
+            offscreen.width = img.width;
+            offscreen.height = img.height;
+
+            gl.drawImage( img, 0, 0, img.width, img.height );
+
+            console.log( ">>", img.width, img.height );
+
+            return gl.getImageData( 0, 0, img.width, img.height );
+        }
+
+        function preventDefault(e) {
+            e = e || event;
+            e.preventDefault();
+        }
+
+        window.addEventListener( "dragover", preventDefault );
+        window.addEventListener( "drop", preventDefault );
+        window.onload = init;
+
+    </script>
+</body>
+</html>

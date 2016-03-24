@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        svg, canvas{
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+
+
+    <svg width="300" height="100">
+        <circle id="circle" r="30" cx="150" cy="50" fill="blue"></circle>
+
+        <script>
+
+            var circle = document.getElementById( "circle" );
+            requestAnimationFrame( onrender );
+
+            console.log( circle );
+
+            function onrender(ms) {
+
+                requestAnimationFrame( onrender );
+                circle.setAttribute( "cx", 300 * ( Math.cos( ms / 500 ) / 2 + 0.5 ) );
+            }
+
+        </script>
+    </svg>
+
+
+    <canvas id="canvas" width="300" height="100">
+        <script>
+            var canvas = document.getElementById( "canvas" );
+            var context = canvas.getContext( "2d" );
+
+            context.fillStyle = "red";
+            context.fillRect( 100, 10, 50, 30 );
+
+            requestAnimationFrame( onrender2 );
+
+            function onrender2( ms ){
+
+                requestAnimationFrame( onrender2 );
+
+                context.clearRect( 0, 0, 300, 100 );
+                context.fillRect( 300 * ( Math.cos( ms/500 ) / 2 + 0.5 ), 10, 50, 30 );
+            }
+
+        </script>
+    </canvas>
+
+</body>
+</html>

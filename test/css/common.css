@@ -1,0 +1,55 @@
+/*photo editor stylesheet*/
+
+.wrapper, .position-absolute{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
+#ui-layer{
+    margin: 5px;
+}
+
+.case-dropdown{
+    width: 350px;
+}
+
+.quad{
+    width: 100px;
+    height: 100px;
+}
+
+.red{
+    background-color: red;
+}
+
+.slider-span{
+    width: 50px;
+    height: 10px;
+}
+
+.forms{
+    visibility: hidden;
+}
+
+.matrix-row{
+    margin-bottom: 3px;
+}
+
+.matrix-container{
+    width: 300px;
+}
+
+.sliders dt{
+    float: left;
+    clear: left;
+    width: 50px;
+    height: 40px;
+    line-height: 40px;
+}
+.sliders dd{
+    float: left;
+    height: 40px;
+    line-height: 40px;
+    margin: 0;
+}
