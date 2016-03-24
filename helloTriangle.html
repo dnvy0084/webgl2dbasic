@@ -34,7 +34,11 @@
 
             var vertexShaderSource =
                     "attribute vec2 vertex;" +
+                    "attribute vec3 color;" +
+                    "varying vec3 fragColor;" +
                     "void main(){" +
+                    "   fragColor = color;" +
+                    "   gl_PointSize = 10.0;" +
                     "   gl_Position = vec4( vertex, 0, 1 );" +
                     "}";
 
@@ -49,8 +53,10 @@
             }
 
             var fragmentShaderSource =
+                    "precision highp float;" +
+                    "varying vec3 fragColor;" +
                     "void main(){" +
-                    "   gl_FragColor = vec4( 1,0,0,1 );" +
+                    "   gl_FragColor = vec4( fragColor.r, fragColor.g, fragColor.b, 1 );" +
                     "}";
 
             var fragmentShader = gl.createShader( gl.FRAGMENT_SHADER );
@@ -74,29 +80,50 @@
         }
 
         var buffer;
+        var indexBuffer;
         function makeBuffer() {
 
             buffer = gl.createBuffer();
 
+            var w = 0.8, h = 0.8;
             var data = new Float32Array([
-                    0, 0.5,// 0번 정점
-                    0.5, -0.5,// 1번 정점
-                    -0.5, -0.5,// 2번 정점
+                    0, 0, 1, 0, 0, // x, y, r, g, b;
+                    w, 0, 0, 1, 0,
+                    w, h, 0, 0, 1,
+                    0, h, 1, 0, 1,
             ])
 
             gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
             gl.bufferData( gl.ARRAY_BUFFER, data, gl.STATIC_DRAW );
+
+            indexBuffer = gl.createBuffer();
+
+            var indexData = new Uint16Array([
+                    0, 1, 2,
+                    0, 2, 3
+            ]);
+
+            gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
+            gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW );
         }
 
         function draw() {
 
             gl.clear( gl.COLOR_BUFFER_BIT );
 
-            var vertexIndex = gl.getAttribLocation( program, "vertex" );
-            gl.enableVertexAttribArray( vertexIndex );
+            gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
+            gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
 
-            gl.vertexAttribPointer( vertexIndex, 2, gl.FLOAT, false, 4 * 2, 0 );
-            gl.drawArrays( gl.TRIANGLES, 0, 3 );
+            var vertexIndex = gl.getAttribLocation( program, "vertex" );
+            var colorIndex = gl.getAttribLocation( program, "color" );
+
+            gl.enableVertexAttribArray( vertexIndex );
+            gl.enableVertexAttribArray( colorIndex );
+            gl.vertexAttribPointer( vertexIndex, 2, gl.FLOAT, false, 4 * 5, 0 );
+            gl.vertexAttribPointer( colorIndex, 3, gl.FLOAT, false, 4 * 5, 4 * 2 );
+            //gl.drawArrays( gl.TRIANGLES, 0, 6 );
+
+            gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
         }
 
         function initGL(){
