@@ -43,6 +43,19 @@
 
             vec4 pixel = texture2D( tex, fragUV );
 
+            //pixel.rgb = pixel.rgb - 0.5; // 밝기
+
+            //pixel.rgb = 2.0 * ( pixel.rgb - 0.5 ) + 0.5; // 대비
+
+            //float grey = pixel.r * 0.2 + pixel.g * 0.7 + pixel.b * 0.1; // 흑백
+
+            //pixel.rgb = vec3( grey, grey, grey );
+            //pixel.r += 0.1;
+
+            //pixel.r = pixel.b;
+            //pixel.g = pixel.g;
+            //pixel.b = pixel.r;
+
             gl_FragColor = pixel;
         }
 
@@ -130,9 +143,9 @@
             var w = img.width, h = img.height;
             var data = new Float32Array([
                     0, 0, 0, 0, // x, y, u, v
-                    w, 0, 1, 0,
-                    w, h, 1, 1,
-                    0, h, 0, 1,
+                    w, 0, 0.5, 0,
+                    w, h, 0.5, 0.5,
+                    0, h, 0, 0.5,
             ])
 
             gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
