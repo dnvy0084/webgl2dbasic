@@ -20,7 +20,7 @@
 
         varying vec2 fragUV;
 
-        unif
+        uniform mat3 mat;
 
         uniform vec2 viewport;
 
@@ -28,21 +28,11 @@
 
             fragUV = uv;
 
-            vec2 p = vertex;
+            vec3 p = vec3( vertex, 1 );
 
-            float cos = cos( rotate );
-            float sin = sin( rotate );
+            p = mat * p;
 
-            float x = cos * p.x - sin * p.y;
-            float y = sin * p.x + cos * p.y;
-
-            //p = vec2( x, y );
-            p.x = x;
-            p.y = y;
-            p = p * scale; // p.x = p.x * scale.x, y
-            p = p + xy;
-
-            p = p / viewport * 2.0 - 1.0;
+            p.xy = p.xy / viewport * 2.0 - 1.0;
 
             gl_Position = vec4( p.x, -p.y, 0, 1 );
         }
@@ -209,28 +199,25 @@
             gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
             gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, indexBuffer );
 
-            //var translate = gl.getUniformLocation( program, "translate" );
-            var xy = gl.getUniformLocation( program, "xy" );
+            var mat = gl.getUniformLocation( program, "mat" );
             var viewport = gl.getUniformLocation( program, "viewport" );
-            var scale = gl.getUniformLocation( program, "scale" );
-            var rotate = gl.getUniformLocation( program, "rotate" );
 
             var uv = gl.getAttribLocation( program, "uv" );
-
             var vertexIndex = gl.getAttribLocation( program, "vertex" );
-            var colorIndex = gl.getAttribLocation( program, "color" );
 
             gl.enableVertexAttribArray( vertexIndex );
             gl.enableVertexAttribArray( uv );
             gl.vertexAttribPointer( vertexIndex, 2, gl.FLOAT, false, 4 * 4, 0 );
             gl.vertexAttribPointer( uv, 2, gl.FLOAT, false, 4 * 4, 4 * 2 );
 
-            gl.uniform2fv( xy, new Float32Array([ 100, 100 ]) );
-            gl.uniform2f( viewport, gl.canvas.width, gl.canvas.height );
-            gl.uniform2f( scale, 2.0, 2.0 );
-            gl.uniform1f( rotate, ms / 1000 );
+            var matVector = new Float32Array([
+                    1,0,0,
+                    0,1,0,
+                    0,0,1
+            ]);
 
-            //gl.drawArrays( gl.TRIANGLES, 0, 6 );
+            gl.uniformMatrix3fv( mat, false, matVector );
+            gl.uniform2f( viewport, gl.canvas.width, gl.canvas.height );
 
             gl.drawElements( gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0 );
         }
