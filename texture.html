@@ -7,21 +7,23 @@
 <body>
     <canvas id="canvas" width="600" height="600">
     </canvas>
+    <img src="img/a.jpg" id="img_a"/>
 
     <script type="x-shader" id="vertexSource">
 
         attribute vec2 vertex;
+        attribute vec2 uv;
+
+        varying vec2 fragUV;
 
         uniform vec2 xy;
-
         uniform vec2 viewport;
 
         void main(){
 
-            vec2 p = vertex + xy;
+            fragUV = uv;
 
-            //p.x = p.x / 600.0 * 2.0 - 1.0;
-            //p.y = p.y / 600.0 * 2.0 - 1.0;
+            vec2 p = vertex + xy;
 
             p = p / viewport * 2.0 - 1.0;
 
@@ -33,8 +35,15 @@
 
         precision highp float;
 
+        varying vec2 fragUV;
+
+        uniform sampler2D tex;
+
         void main(){
-            gl_FragColor = vec4( 1, 0, 0, 1 );
+
+            vec4 pixel = texture2D( tex, fragUV );
+
+            gl_FragColor = pixel;
         }
 
     </script>
@@ -53,9 +62,25 @@
             initGL();
 
             makeProgram();
+            makeTexture();
             makeBuffer();
 
             requestAnimationFrame( draw );
+        }
+
+        var tex;
+        var img;
+        function makeTexture() {
+
+            tex = gl.createTexture();
+            img = document.getElementById( "img_a" );
+
+            gl.bindTexture( gl.TEXTURE_2D, tex );
+                gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE );
+                gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE );
+                gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
+                gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR );
+            gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img );
         }
 
         var program;
@@ -102,12 +127,12 @@
 
             buffer = gl.createBuffer();
 
-            var w = 150, h = 150;
+            var w = img.width, h = img.height;
             var data = new Float32Array([
-                    0, 0,
-                    w, 0,
-                    w, h,
-                    0, h,
+                    0, 0, 0, 0, // x, y, u, v
+                    w, 0, 1, 0,
+                    w, h, 1, 1,
+                    0, h, 0, 1,
             ])
 
             gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
@@ -137,11 +162,15 @@
             var xy = gl.getUniformLocation( program, "xy" );
             var viewport = gl.getUniformLocation( program, "viewport" );
 
+            var uv = gl.getAttribLocation( program, "uv" );
+
             var vertexIndex = gl.getAttribLocation( program, "vertex" );
             var colorIndex = gl.getAttribLocation( program, "color" );
 
             gl.enableVertexAttribArray( vertexIndex );
-            gl.vertexAttribPointer( vertexIndex, 2, gl.FLOAT, false, 4 * 2, 0 );
+            gl.enableVertexAttribArray( uv );
+            gl.vertexAttribPointer( vertexIndex, 2, gl.FLOAT, false, 4 * 4, 0 );
+            gl.vertexAttribPointer( uv, 2, gl.FLOAT, false, 4 * 4, 4 * 2 );
 
             gl.uniform2fv( xy, new Float32Array([ 100, 100 ]) );
             gl.uniform2f( viewport, gl.canvas.width, gl.canvas.height );
