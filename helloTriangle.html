@@ -8,6 +8,46 @@
     <canvas id="canvas" width="600" height="600">
     </canvas>
 
+    <script type="x-shader" id="vertexSource">
+
+        // 변수타입 변수명 var a = 1;
+        // int a = 1;
+
+        // var a = [];
+        // a[0] = 1;
+
+        //vec2 a = vec2( 1, 2 );
+        //vec2 b = vec2( 3, 4 );
+
+        //vec2 c = a + b;
+
+        // c.x = a.x + b.x;
+        // c.y = a.y + b.y;
+
+        attribute vec2 vertex; // ( x, y ) or ( r, g ); vertex.x, vertex.y == vertex.r, vertex.g
+        attribute vec3 color;
+
+        varying vec3 fragColor;
+
+        void main(){
+
+            fragColor = color;
+
+            gl_Position = vec4( vertex.x, vertex.y, 0, 1 );
+        }
+
+    </script>
+    <script type="x-shader" id="fragmentSource">
+
+        precision highp float;
+
+        varying vec3 fragColor;
+
+        void main(){
+            gl_FragColor = vec4( fragColor, 1 );
+        }
+
+    </script>
     <script>
 
         var canvas;
@@ -32,17 +72,9 @@
         function makeProgram() {
             program = gl.createProgram();
 
-            var vertexShaderSource =
-                    "attribute vec2 vertex;" +
-                    "attribute vec3 color;" +
-                    "varying vec3 fragColor;" +
-                    "void main(){" +
-                    "   fragColor = color;" +
-                    "   gl_PointSize = 10.0;" +
-                    "   gl_Position = vec4( vertex, 0, 1 );" +
-                    "}";
-
+            var vertexShaderSource = document.getElementById( "vertexSource").innerHTML;
             var vertexShader = gl.createShader( gl.VERTEX_SHADER );
+
             gl.shaderSource( vertexShader, vertexShaderSource );
             gl.compileShader( vertexShader );
 
@@ -52,14 +84,9 @@
                 console.log(gl.getShaderInfoLog(vertexShader));
             }
 
-            var fragmentShaderSource =
-                    "precision highp float;" +
-                    "varying vec3 fragColor;" +
-                    "void main(){" +
-                    "   gl_FragColor = vec4( fragColor.r, fragColor.g, fragColor.b, 1 );" +
-                    "}";
-
+            var fragmentShaderSource = document.getElementById( "fragmentSource").innerHTML;
             var fragmentShader = gl.createShader( gl.FRAGMENT_SHADER );
+
             gl.shaderSource( fragmentShader, fragmentShaderSource );
             gl.compileShader( fragmentShader );
 
