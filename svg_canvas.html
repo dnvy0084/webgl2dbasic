@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        .border{
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <svg class="border" width="300" height="100">
+        <circle r="30" cx="150" cy="50" fill="red" id="circle"></circle>
+
+        <script>
+
+            var circle = document.getElementById( "circle" );
+
+            circle.setAttribute( "cx", 200 );
+
+            requestAnimationFrame( onrender );
+
+            function onrender(ms){
+                requestAnimationFrame( onrender );
+
+                var hue = 360 * ( Math.cos( ms / 500 ) / 2 + 0.5 )
+
+                circle.setAttribute( "cx", 300 * ( Math.cos( ms / 500 ) / 2 + 0.5 ) );
+                circle.setAttribute( "fill", "hsl(" +  hue + ",100%,50%)")
+            }
+
+        </script>
+    </svg>
+    <canvas class="border" id="canvas" width="300" height="100">
+
+        <script>
+
+            var canvas = document.getElementById( "canvas" );
+            var context = canvas.getContext( "2d" );
+
+            context.fillStyle = "red";
+            context.fillRect( 150, 50, 30, 30 );
+
+            requestAnimationFrame( onrender2 );
+
+            function onrender2(ms) {
+
+                requestAnimationFrame( onrender2 );
+
+                context.clearRect( 0, 0, 300, 150 );
+
+                context.fillStyle = "blue";
+                context.fillRect( 300 * ( Math.cos( ms / 500 ) / 2 + 0.5 ), 50, 30, 30 );
+            }
+
+        </script>
+        //https://github.com/dnvy0084/webgl2dbasic.git
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </canvas>
+</body>
+</html>
